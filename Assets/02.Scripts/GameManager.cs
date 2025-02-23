@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
 
     public float spawnInterval = 2f;
     public float spawnDefault = 0f;
-
+    public bool isSpawning = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     {
         spawnDefault += Time.deltaTime;
 
-        if(spawnDefault >= spawnInterval)
+        if(spawnDefault >= spawnInterval && isSpawning)
         {
             SpawnObstacle();
             spawnDefault = 0;
