@@ -14,6 +14,20 @@ public class ObstacleController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        rb.velocity = new Vector2(moveSpeedX, 0);
+        if (!GameManager.instance.gameOverPanel.activeSelf)
+        {
+            rb.velocity = new Vector2(moveSpeedX, 0);
+        }
+        else
+        {
+            rb.velocity = new Vector2(0, 0);
+        }
+    }
+
+    
+
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
     }
 }

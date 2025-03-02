@@ -24,19 +24,22 @@ public class Scroll : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!isCloud)
-            soMesh.material.mainTextureOffset += new Vector2(scrollSpeed * Time.deltaTime, 0);
-        else
+        if (!GameManager.instance.gameOverPanel.activeSelf)
         {
-            Vector3 thisVec = transform.position;
-            thisVec.x -= scrollSpeed * Time.deltaTime;
-
-            if (thisVec.x < -11f)
+            if (!isCloud)
+                soMesh.material.mainTextureOffset += new Vector2(scrollSpeed * Time.deltaTime, 0);
+            else
             {
-                thisVec = new Vector3(11, Random.Range(0, 5));
-            }
+                Vector3 thisVec = transform.position;
+                thisVec.x -= scrollSpeed * Time.deltaTime;
 
-            transform.position = thisVec;
+                if (thisVec.x < -11f)
+                {
+                    thisVec = new Vector3(11, Random.Range(0, 5));
+                }
+
+                transform.position = thisVec;
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ public class DinoController : MonoBehaviour
     public Transform SpawnCheckPoint;
     public LayerMask whatIsGround; //ground인지 비교할 Mask
     public LayerMask whatIsEnemy;
+    public AudioSource ScoreSound;
 
     [SerializeField]
     [Tooltip("boxCollider offset과 size를 변경")]
@@ -29,6 +30,7 @@ public class DinoController : MonoBehaviour
     private Rigidbody2D rb;
     private BoxCollider2D boxCollider;
     private List<Vector2> spawnPositions;
+    private AudioSource Aud;
 
 
 
@@ -37,9 +39,11 @@ public class DinoController : MonoBehaviour
 
     void Start()
     {
+        
         boxCollider = GetComponent<BoxCollider2D>();
         Anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        Aud = GetComponent<AudioSource>();
 
         SaveColliderSettings();
         InitializeSpawnPositions();
@@ -53,30 +57,38 @@ public class DinoController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        isGround = Physics2D.OverlapCircle(groundCheckPoint.position, 0.2f, whatIsGround);
-        isShootable = Physics2D.OverlapCircle(ArrowRangePoint.position, 5f, whatIsEnemy);
-
-        if (Input.GetKeyDown(KeyCode.Space) && isGround.Equals(true))
+        if (!GameManager.instance.gameOverPanel.activeSelf)
         {
-            if(!isDown)
-            //rb.AddForce(Vector2.up * jumpPower , ForceMode2D.Impulse);
-            rb.velocity = new Vector2(rb.velocity.x, jumpPower);
-            //Anim.SetBool("isGround", false);
-        }
+            isGround = Physics2D.OverlapCircle(groundCheckPoint.position, 0.2f, whatIsGround);
+            isShootable = Physics2D.OverlapCircle(ArrowRangePoint.position, 5f, whatIsEnemy);
 
-        Anim.SetBool("isGround", isGround);
+            if (Input.GetKeyDown(KeyCode.Space) && isGround.Equals(true))
+            {
+                if (!isDown)
+                {
+                    //rb.AddForce(Vector2.up * jumpPower , ForceMode2D.Impulse);
+                    rb.velocity = new Vector2(rb.velocity.x, jumpPower);
+                    Aud.Play();
+                }
+                    
+                //Anim.SetBool("isGround", false);
+            }
 
-        if (Input.GetKeyDown(KeyCode.DownArrow) && isGround.Equals(true))
-        {
-            SetDownArrowDown();
-            
-        }
+            Anim.SetBool("isGround", isGround);
 
-        if (Input.GetKeyUp(KeyCode.DownArrow) && isGround.Equals(true))
-        {
-            SetDownArrowUp();
-            
+            if (Input.GetKeyDown(KeyCode.DownArrow) && isGround.Equals(true))
+            {
+                SetDownArrowDown();
+
+            }
+
+            if (Input.GetKeyUp(KeyCode.DownArrow) && isGround.Equals(true))
+            {
+                SetDownArrowUp();
+
+            }
         }
+        
 
     }
 
@@ -106,6 +118,7 @@ public class DinoController : MonoBehaviour
         Anim.SetBool("isDown", false);
         LoadColliderSettings();
         isDown = false;
+        
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -164,6 +177,20 @@ public class DinoController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("뭔가 충돌");
+        if(collision.gameObject.CompareTag("Obstacle"))
+        {
+            Debug.Log("게임 오버");
+            Anim.SetBool("isDie", true);
+            GameManager.instance.GameOver();
+        }
+
+        if (collision.gameObject.CompareTag("Point"))
+        {
+            Debug.Log("점수 휙득");
+            GameManager.instance.mainScore += 10;
+            GameManager.instance.updateScore();
+            ScoreSound.Play();
+        }
+
     }
 }
